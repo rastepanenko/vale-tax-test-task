@@ -1,5 +1,5 @@
 import { RouteProp, useRoute } from "@react-navigation/native";
-import { FlatList, StyleSheet, Text, View, Image } from "react-native";
+import { FlatList, StyleSheet, View } from "react-native";
 import { ICurrency } from "../Types/Types";
 import { TextInput } from "react-native-paper";
 import Item from "./Item";
@@ -22,7 +22,7 @@ export default function CurrenciesList() {
     
     return (
         <View style={styles.container}>
-            <View style={{ width: '100%', marginTop: 25 }}>
+            <View style={styles.textInput}>
                 <TextInput
                     style={styles.valueInput}
                     left={<TextInput.Icon icon={'magnify'} />}
@@ -70,5 +70,9 @@ const styles = StyleSheet.create({
         width: '100%', 
         backgroundColor: '#E7E7E7', 
         borderRadius: 8,
+    },
+    textInput: {
+        width: '100%', 
+        marginTop: 25
     }
 });
