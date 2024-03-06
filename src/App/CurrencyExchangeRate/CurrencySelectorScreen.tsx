@@ -1,46 +1,27 @@
 import { View, StyleSheet, Text, TouchableOpacity, Image, TextInput } from "react-native";
-import DropDown from "../Components/DropDown";
+import DropDown from "../../Components/DropDown";
 import { useEffect, useState } from "react";
-import { ICurrency } from "../Types/Types";
-import useCurrencies from "../Hooks/useCurrencies";
-import { Descriptions, Flags, Symbols } from "../Components/Dictionary";
+import useCurrencies from "../../Hooks/useCurrencies";
 import { useNavigation } from "@react-navigation/native";
-import { useRecoilState } from "recoil";
-import { currentFirstCurrencyAtom, currentSecondCurrencyAtom } from "../Services/RecoilService";
 
-export default function ChooseCurrencyScreen() {
-
-    const [currentFirstCurrency, setCurrentFirstCurrency] = useRecoilState<ICurrency>(currentFirstCurrencyAtom);
-    const [currentSecondCurrency, setCurrentSecondCurrency] = useRecoilState<ICurrency>(currentSecondCurrencyAtom);
-    const [currenciesList, setCurrenciesList] = useState<ICurrency[]>([]);
+export default function CurrencySelectorScreen() {
     const [exchangeAmount, setExchangeAmount] = useState(1);
     const {
-        currenciesData,
-        getCurrencies,
+        currencies,
+        currentFromCurrency,
+        currentToCurrency,
+        updateCurrencies,
+        setCurrentFromCurrency,
+        setCurrentToCurrency,
         isLoading,
-    } = useCurrencies(currentFirstCurrency);
+    } = useCurrencies();
     const navigation = useNavigation()
 
     useEffect(() => {
-        if (currenciesData) {
-            setCurrenciesList([])
-            Object.keys(currenciesData.rates).map((item, index) => {
-                setCurrenciesList(prevState => [...prevState, {
-                    flag: Flags(item),
-                    title: item,
-                    rate: Object.values(currenciesData.rates)[index],
-                    description: Descriptions(item),
-                    symbol: Symbols(item)
-                }])
-            })
-        }
-    }, [currenciesData])
-
-    useEffect(() => {
         (async () => {
-            await getCurrencies(currentFirstCurrency);
+            await updateCurrencies(currentFromCurrency);
         })()
-    }, [currentFirstCurrency])
+    }, [currentFromCurrency])
 
     return (
         <View style={styles.container}>
@@ -53,26 +34,26 @@ export default function ChooseCurrencyScreen() {
                         style={styles.currencyContainer}
                         onPress={() =>
                             //@ts-ignore
-                            navigation.navigate('CurrenciesList', { currenciesList: currenciesList, isSetFirst: true, isSetSecond: false })
+                            navigation.navigate('Currencies', { currencies: currencies, isSetFirst: true, })
                         }
                     >
-                        <Image source={currentFirstCurrency.flag} style={{ width: 25, height: 20 }} />
+                        <Image source={currentFromCurrency.flag} style={{ width: 25, height: 20 }} />
                         <Text>
-                            {currentFirstCurrency.title}
+                            {currentFromCurrency.title}
                         </Text>
                         <DropDown />
                     </TouchableOpacity>
                 </View>
                 <View style={styles.swapButton}>
-                    <TouchableOpacity 
+                    <TouchableOpacity
                         onPress={() => {
-                            if(currentSecondCurrency) {
-                                setCurrentFirstCurrency(currentSecondCurrency);
-                                setCurrentSecondCurrency(currentFirstCurrency);
+                            if (currentToCurrency) {
+                                setCurrentFromCurrency(currentToCurrency);
+                                setCurrentToCurrency(currentFromCurrency);
                             }
                         }}
                     >
-                    <Image source={require('../../assets/exchange.png')} style={{ width: 20, height: 20 }} />
+                        <Image source={require('../../../assets/exchange.png')} style={{ width: 20, height: 20 }} />
                     </TouchableOpacity>
                 </View>
                 <View style={styles.rowElement}>
@@ -83,16 +64,16 @@ export default function ChooseCurrencyScreen() {
                         style={styles.currencyContainer}
                         onPress={() =>
                             //@ts-ignore
-                            navigation.navigate('CurrenciesList', { currenciesList: currenciesList, isSetSecond: true, isSetFirst: false })
+                            navigation.navigate('Currencies', { currencies: currencies, isSetFirst: false })
                         }
                     >
-                        {currentSecondCurrency
-                            ? <Image source={currentSecondCurrency.flag} style={{ width: 25, height: 20 }} />
+                        {currentToCurrency
+                            ? <Image source={currentToCurrency.flag} style={{ width: 25, height: 20 }} />
                             : <View style={{ backgroundColor: 'transparent', width: 20, }} />
                         }
-                        {currentSecondCurrency
+                        {currentToCurrency
                             ? <Text>
-                                {currentSecondCurrency.title}
+                                {currentToCurrency.title}
                             </Text>
                             : null
                         }
@@ -112,11 +93,11 @@ export default function ChooseCurrencyScreen() {
             </View>
             <View style={{ width: '100%', alignItems: 'flex-start', marginTop: 30, }}>
                 <Text style={{ fontSize: 16 }}>
-                    {`${exchangeAmount}${currentFirstCurrency.symbol} =`}
+                    {`${exchangeAmount}${currentFromCurrency.symbol} =`}
                 </Text>
-                {currentSecondCurrency
+                {currentToCurrency
                     ? <Text style={{ fontSize: 42 }}>
-                        {`${(exchangeAmount * currentSecondCurrency.rate).toFixed(4)} ${currentSecondCurrency.symbol}`}
+                        {`${(exchangeAmount * currentToCurrency.rate).toFixed(4)} ${currentToCurrency.symbol}`}
                     </Text>
                     : null
                 }
@@ -160,11 +141,11 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     swapButton: {
-        width: '20%', 
-        height: 80, 
-        flexDirection: 'column', 
-        justifyContent: 'flex-end', 
-        alignItems: 'center', 
+        width: '20%',
+        height: 80,
+        flexDirection: 'column',
+        justifyContent: 'flex-end',
+        alignItems: 'center',
         paddingBottom: 11
     }
 });

@@ -11,7 +11,7 @@ export default function Main() {
                 style={styles.startButton} 
                 onPress={() => 
                     //@ts-ignore
-                    navigation.navigate('ChooseCurrencyScreen')}
+                    navigation.navigate('CurrencySelectorScreen')}
             >
                 <Text>
                     Convert currency

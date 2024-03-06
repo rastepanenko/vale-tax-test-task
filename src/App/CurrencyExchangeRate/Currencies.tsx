@@ -1,42 +1,45 @@
 import { RouteProp, useRoute } from "@react-navigation/native";
 import { FlatList, StyleSheet, View } from "react-native";
-import { ICurrency } from "../Types/Types";
+import { ICurrency } from "../../Types/Types";
 import { TextInput } from "react-native-paper";
-import Item from "./Item";
 import { useEffect, useState } from "react";
+import CurrencyItem from "./CurrencyItem";
 
-interface IProps {
-    currenciesList: ICurrency[];
+interface ICurrenciesProps {
+    currencies: ICurrency[];
     isSetFirst: boolean;
     isSetSecond: boolean;
 }
 
-export default function CurrenciesList() {
-    const route: RouteProp<{params: IProps}, 'params'> = useRoute();
+export default function Currencies() {
+    const route: RouteProp<{ params: ICurrenciesProps }, 'params'> = useRoute();
     const [searchValue, setSearchValue] = useState('')
     const [currenciesList, setCurrenciesList] = useState([]);
 
     useEffect(() => {
-        setCurrenciesList(route.params.currenciesList.filter((item) => item.description.toLowerCase().includes(searchValue.toLowerCase()) || item.title.toLowerCase().includes(searchValue.toLowerCase())))
-    }, [searchValue])
-    
+        setCurrenciesList(route.params.currencies.filter((item) => 
+            item.description.toLowerCase().includes(searchValue.toLowerCase()) 
+            || item.title.toLowerCase().includes(searchValue.toLowerCase())
+        ))
+    }, [searchValue, route])
+
     return (
         <View style={styles.container}>
             <View style={styles.textInput}>
                 <TextInput
                     style={styles.valueInput}
                     left={<TextInput.Icon icon={'magnify'} />}
-                    underlineStyle={{display: 'none'}}
+                    underlineStyle={{ display: 'none' }}
                     onChangeText={(txt) => setSearchValue(txt)}
                 />
             </View>
-            <FlatList 
+            <FlatList
                 style={styles.list}
                 data={currenciesList}
                 renderItem={(item) => {
-                  return (
-                    <Item currency={item.item} isSetFirst={route.params.isSetFirst} isSetSecond={route.params.isSetSecond} />
-                  )
+                    return (
+                        <CurrencyItem currency={item.item} isSetFirst={route.params.isSetFirst} />
+                    )
                 }}
                 keyExtractor={(item) => item.title}
             />
@@ -66,13 +69,13 @@ const styles = StyleSheet.create({
         paddingHorizontal: 10,
     },
     list: {
-        marginTop: 20, 
-        width: '100%', 
-        backgroundColor: '#E7E7E7', 
+        marginTop: 20,
+        width: '100%',
+        backgroundColor: '#E7E7E7',
         borderRadius: 8,
     },
     textInput: {
-        width: '100%', 
+        width: '100%',
         marginTop: 25
     }
 });

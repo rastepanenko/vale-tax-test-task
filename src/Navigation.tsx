@@ -4,8 +4,8 @@ import { createStackNavigator } from "@react-navigation/stack";
 import React from "react";
 import { Platform } from "react-native";
 import Main from "./Main";
-import ChooseCurrencyScreen from "./App/ChooseCurrencyScreen";
-import CurrenciesList from "./App/CurrenciesList";
+import Currencies from "./App/CurrencyExchangeRate/Currencies";
+import CurrencySelectorScreen from "./App/CurrencyExchangeRate/CurrencySelectorScreen";
 
 const createStack =
     Platform.OS === 'ios' ? createStackNavigator : createNativeStackNavigator
@@ -33,15 +33,15 @@ const RootStackNavigation = () => {
                 }}
             />
             <RootStack.Screen
-                name="ChooseCurrencyScreen"
-                component={ChooseCurrencyScreen}
+                name="CurrencySelectorScreen"
+                component={CurrencySelectorScreen}
                 options={{
                     headerShown: false,
                 }}
             />
             <RootStack.Screen
-                name="CurrenciesList"
-                component={CurrenciesList}
+                name="Currencies"
+                component={Currencies}
                 options={{
                     headerShown: true,
                     headerTitle: 'Currency Select'
